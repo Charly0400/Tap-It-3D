@@ -6,52 +6,38 @@ using UnityEngine.InputSystem;
 
 public class CubosInteractuables : MonoBehaviour
 {
-    public Animator animator; // Referencia al componente Animator
-    public LayerMask obstacleLayer; // Capa de obstáculos para detectar colisiones
+    public float moveDistance = 2f;
+    private bool canMove = true;
 
-    private bool canMove = true; // Indica si el cubo puede moverse
-/*
-    private MouseInputAction inputMouse;
-
-    private void Awake()
+    private void OnMouseDown()
     {
-        inputMouse = new MouseInputAction();
-        inputMouse.Enable();
-    }
-
-    private void Start()
-        inputMouse.Standard.LeftClick.performed += clickIzq;
-
-    void clickIzq(InputAction.CallbackContext context) { }
-  */
-    void Update()
-    {
-        // Verificamos si se ha presionado el botón izquierdo del ratón
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        // Verifica si el cubo puede moverse
+        if (canMove)
         {
-            if (canMove)
-            {
-                MoveCube();
-            }
+            StartCoroutine(MoveCube());
         }
     }
 
-    void MoveCube()
+    IEnumerator MoveCube()
     {
-        // Ejecutar animación de desaparición
-        animator.Play("New Animation");
-
-        // Deshabilitar movimiento y colisiones
         canMove = false;
-        GetComponent<Collider>().enabled = false;
+        Collider collider = GetComponent<Collider>();
+        collider.enabled = false;
 
-        // Obtener el estado actual de la animación
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        Vector3 currentPosition = transform.position;
+        Vector3 targetPosition = currentPosition + Vector3.up * moveDistance;
+        float duration = 1.0f;
+        float elapsedTime = 0f;
 
-        // Obtener la duración de la animación
-        float animationDuration = stateInfo.length;
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsedTime / duration);
+            t = t * t * (3f - 2f * t);
+            transform.position = Vector3.Lerp(currentPosition, targetPosition, t);
+            yield return null;
+        }
 
-        // Destruir el objeto después de la duración de la animación
-        Destroy(gameObject, animationDuration);
+        Destroy(gameObject);
     }
 }
