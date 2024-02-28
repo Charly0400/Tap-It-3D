@@ -25,7 +25,8 @@ public class CubosInteractuables : MonoBehaviour
         collider.enabled = false;
 
         Vector3 currentPosition = transform.position;
-        Vector3 targetPosition = currentPosition + Vector3.up * moveDistance;
+        Vector3 moveDirection = transform.up;
+        Vector3 targetPosition = currentPosition + moveDirection * moveDistance;
         float duration = 1.0f;
         float elapsedTime = 0f;
 
