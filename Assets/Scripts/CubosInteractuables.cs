@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 public class CubosInteractuables : MonoBehaviour
 {
-    public float moveDistance = 2f;
+    public float moveDistance = 1f;
     private bool canMove = true;
 
     private void OnMouseDown()
@@ -25,20 +25,39 @@ public class CubosInteractuables : MonoBehaviour
         collider.enabled = false;
 
         Vector3 currentPosition = transform.position;
+
+        // Obtener la dirección hacia la que mira el cubo en su espacio local
         Vector3 moveDirection = transform.up;
+
+        // Calcular la posición objetivo hacia la que mover el cubo
         Vector3 targetPosition = currentPosition + moveDirection * moveDistance;
-        float duration = 1.0f;
-        float elapsedTime = 0f;
 
-        while (elapsedTime < duration)
+        // Realizar un raycast en la dirección de movimiento para verificar si el espacio está vacío
+        RaycastHit hit;
+        if (!Physics.Raycast(targetPosition, -moveDirection, out hit, moveDistance))
         {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
-            t = t * t * (3f - 2f * t);
-            transform.position = Vector3.Lerp(currentPosition, targetPosition, t);
-            yield return null;
-        }
+            // Si no hay ningún objeto en la posición objetivo, mover el cubo
+            float duration = 1.0f;
+            float elapsedTime = 0f;
 
-        Destroy(gameObject);
+            while (elapsedTime < duration)
+            {
+                elapsedTime += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsedTime / duration);
+                t = t * t * (3f - 2f * t);
+                transform.position = Vector3.Lerp(currentPosition, targetPosition, t);
+                yield return null;
+            }
+
+            // Destruir el cubo solo si se pudo mover con éxito
+            Destroy(gameObject);
+        }
+        else
+        {
+            // Revertir la desactivación del collider si el cubo no se movió
+            canMove = true;
+            collider.enabled = true;
+        }
     }
 }
+
