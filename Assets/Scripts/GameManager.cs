@@ -8,6 +8,7 @@ public enum Direction { Arriba, Abajo, Izquierda, Derecha, Delante, Atras }
 
 public class GameManager : MonoBehaviour
 {
+    public Timer timer; // Referencia al script Timer
     public List<GameObject> blockPrefabs; // Lista de prefabs con direcciones rotadas
     public int rows = 5; // Número de filas en el nivel
     public int columns = 5; // Número de columnas en el nivel
@@ -28,6 +29,8 @@ public class GameManager : MonoBehaviour
         // Verificar si todos los bloques han sido eliminados
         if (AllBlocksDestroyed())
         {
+            // Si todos los bloques han sido destruidos, reinicia el temporizador y genera un nuevo nivel
+            timer.ResetTimer();
             currentLevel++;
             GenerateLevel(currentLevel);
         }
@@ -210,4 +213,7 @@ public class GameManager : MonoBehaviour
         // Verificar si todos los bloques se han eliminado
         return removableBlocks.Count == 0;
     }
+    // Método llamado cuando el temporizador llega a cero
+
+
 }
