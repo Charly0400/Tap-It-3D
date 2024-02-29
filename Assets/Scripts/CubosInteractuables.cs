@@ -6,9 +6,21 @@ using UnityEngine.InputSystem;
 
 public class CubosInteractuables : MonoBehaviour
 {
+    public Direction blockDirection;
     public float moveDistance = 1f;
     private bool canMove = true;
+    private MouseInputAction clickCentral;
 
+
+    private void Awake()
+    {
+        clickCentral = new MouseInputAction();
+        clickCentral.Enable();
+    }
+    private void Start()
+    {
+        clickCentral.Standard.CentralClick.performed += ClickCentral;
+    }
     private void OnMouseDown()
     {
         // Verifica si el cubo puede moverse
@@ -57,6 +69,29 @@ public class CubosInteractuables : MonoBehaviour
             // Revertir la desactivación del collider si el cubo no se movió
             canMove = true;
             collider.enabled = true;
+        }
+    }
+
+    public void SetBlockDirection(Vector3 direction)
+    {
+        // Normaliza la dirección y la establece como la dirección de movimiento
+        direction.Normalize();
+        transform.up = direction;
+    }
+
+    public void ClickCentral(InputAction.CallbackContext context)
+    {
+        // Lanzar un rayo desde la posición del mouse
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            // Verificar si el rayo colisiona con este cubo
+            if (hit.collider.gameObject == gameObject)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

@@ -35,6 +35,15 @@ public partial class @MouseInputAction : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CentralClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""e3ff7fd4-2c08-4ed7-b469-f028c1ab221c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -48,6 +57,89 @@ public partial class @MouseInputAction : IInputActionCollection2, IDisposable
                     ""action"": ""LeftClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""5ff30392-4b8f-4250-b355-b948c4c3337b"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CentralClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Camera"",
+            ""id"": ""da8f0386-c6c6-4495-a81a-0f9ca8871337"",
+            ""actions"": [
+                {
+                    ""name"": ""Movement"",
+                    ""type"": ""Value"",
+                    ""id"": ""af50a2c5-6d2a-4583-88ca-942e3f1fc22b"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""b2572971-f102-4802-bf33-4a6a5d9389c4"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""155d1ce2-a84c-4658-aa9c-ec3386506179"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""b8ba0976-65bc-42d4-b245-a1e30ea9ccf2"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""2179ad16-fd7d-42ef-b55e-98817403df2d"",
+                    ""path"": ""<Keyboard>/a"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""730534ce-c65c-4b25-8b30-63d0227fb427"",
+                    ""path"": ""<Keyboard>/d"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Movement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -57,6 +149,10 @@ public partial class @MouseInputAction : IInputActionCollection2, IDisposable
         // Standard
         m_Standard = asset.FindActionMap("Standard", throwIfNotFound: true);
         m_Standard_LeftClick = m_Standard.FindAction("LeftClick", throwIfNotFound: true);
+        m_Standard_CentralClick = m_Standard.FindAction("CentralClick", throwIfNotFound: true);
+        // Camera
+        m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
+        m_Camera_Movement = m_Camera.FindAction("Movement", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -117,11 +213,13 @@ public partial class @MouseInputAction : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Standard;
     private IStandardActions m_StandardActionsCallbackInterface;
     private readonly InputAction m_Standard_LeftClick;
+    private readonly InputAction m_Standard_CentralClick;
     public struct StandardActions
     {
         private @MouseInputAction m_Wrapper;
         public StandardActions(@MouseInputAction wrapper) { m_Wrapper = wrapper; }
         public InputAction @LeftClick => m_Wrapper.m_Standard_LeftClick;
+        public InputAction @CentralClick => m_Wrapper.m_Standard_CentralClick;
         public InputActionMap Get() { return m_Wrapper.m_Standard; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -134,6 +232,9 @@ public partial class @MouseInputAction : IInputActionCollection2, IDisposable
                 @LeftClick.started -= m_Wrapper.m_StandardActionsCallbackInterface.OnLeftClick;
                 @LeftClick.performed -= m_Wrapper.m_StandardActionsCallbackInterface.OnLeftClick;
                 @LeftClick.canceled -= m_Wrapper.m_StandardActionsCallbackInterface.OnLeftClick;
+                @CentralClick.started -= m_Wrapper.m_StandardActionsCallbackInterface.OnCentralClick;
+                @CentralClick.performed -= m_Wrapper.m_StandardActionsCallbackInterface.OnCentralClick;
+                @CentralClick.canceled -= m_Wrapper.m_StandardActionsCallbackInterface.OnCentralClick;
             }
             m_Wrapper.m_StandardActionsCallbackInterface = instance;
             if (instance != null)
@@ -141,12 +242,53 @@ public partial class @MouseInputAction : IInputActionCollection2, IDisposable
                 @LeftClick.started += instance.OnLeftClick;
                 @LeftClick.performed += instance.OnLeftClick;
                 @LeftClick.canceled += instance.OnLeftClick;
+                @CentralClick.started += instance.OnCentralClick;
+                @CentralClick.performed += instance.OnCentralClick;
+                @CentralClick.canceled += instance.OnCentralClick;
             }
         }
     }
     public StandardActions @Standard => new StandardActions(this);
+
+    // Camera
+    private readonly InputActionMap m_Camera;
+    private ICameraActions m_CameraActionsCallbackInterface;
+    private readonly InputAction m_Camera_Movement;
+    public struct CameraActions
+    {
+        private @MouseInputAction m_Wrapper;
+        public CameraActions(@MouseInputAction wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Movement => m_Wrapper.m_Camera_Movement;
+        public InputActionMap Get() { return m_Wrapper.m_Camera; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(CameraActions set) { return set.Get(); }
+        public void SetCallbacks(ICameraActions instance)
+        {
+            if (m_Wrapper.m_CameraActionsCallbackInterface != null)
+            {
+                @Movement.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
+                @Movement.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
+                @Movement.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnMovement;
+            }
+            m_Wrapper.m_CameraActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @Movement.started += instance.OnMovement;
+                @Movement.performed += instance.OnMovement;
+                @Movement.canceled += instance.OnMovement;
+            }
+        }
+    }
+    public CameraActions @Camera => new CameraActions(this);
     public interface IStandardActions
     {
         void OnLeftClick(InputAction.CallbackContext context);
+        void OnCentralClick(InputAction.CallbackContext context);
+    }
+    public interface ICameraActions
+    {
+        void OnMovement(InputAction.CallbackContext context);
     }
 }
